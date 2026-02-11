@@ -7,12 +7,16 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "nuxt prepare && prisma generate --schema=server/prisma/schema.prisma",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest --project unit",
-    "test:nuxt": "vitest --project nuxt"
+    "test:nuxt": "vitest --project nuxt",
+    "db:migrate": "prisma migrate dev --schema=server/prisma/schema.prisma",
+    "db:seed": "tsx server/prisma/seed.ts",
+    "db:studio": "prisma studio --schema=server/prisma/schema.prisma",
+    "db:reset": "prisma migrate reset --schema=server/prisma/schema.prisma"
   },
   "dependencies": {
     "@nuxt/eslint": "1.15.1",
@@ -23,21 +27,32 @@
     "@nuxt/test-utils": "4.0.0",
     "@nuxt/ui": "^4.4.0",
     "@pinia/nuxt": "0.11.3",
+    "@prisma/client": "5.22.0",
     "@vee-validate/nuxt": "4.15.1",
     "@vueuse/nuxt": "14.2.1",
+    "bcrypt": "^6.0.0",
     "clsx": "^2.1.1",
     "nuxt": "^4.3.1",
+    "prisma": "5.22.0",
     "tailwind-merge": "^3.4.0",
     "vue": "^3.5.28",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "zod": "^4.3.6"
   },
   "packageManager": "pnpm@10.26.2+sha512.0e308ff2005fc7410366f154f625f6631ab2b16b1d2e70238444dd6ae9d630a8482d92a451144debc492416896ed16f7b114a86ec68b8404b2443869e68ffda6",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.24",
+    "better-sqlite3": "^12.6.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.19.2",
     "vitest": "^4.0.18"
+  },
+  "prisma": {
+    "seed": "tsx server/prisma/seed.ts"
   }
 }
