@@ -3,7 +3,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  css: ['~/assets/css/main.css'],
+
   modules: [
+    '@nuxt/ui',
     '@nuxt/fonts',
     '@nuxt/image',
     '@nuxt/eslint',
@@ -12,8 +15,6 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@vee-validate/nuxt',
     '@pinia/nuxt',
-    'shadcn-nuxt',
-    '@nuxtjs/tailwindcss',
     '@vueuse/nuxt'
   ]
 })
