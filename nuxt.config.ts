@@ -7,6 +7,13 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  components: {
+    dirs: [
+      '~/components/ui',
+      '~/components/partials',
+    ]
+  },
+
   modules: [
     '@nuxt/ui',
     '@nuxt/fonts',

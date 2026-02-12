@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+pnpm-lock.yaml
+
+# Build outputs
+.nuxt
+.output
+dist
+.vinxi
+
+# Cache
+.cache
+
+# Database
+*.db
+*.db-journal
+
+# Prisma
+server/prisma/migrations
+
+# Misc
+.DS_Store
+coverage
+*.log
