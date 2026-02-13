@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen">
-    Dashboard
+    <Header />
     <slot />
   </div>
 </template>

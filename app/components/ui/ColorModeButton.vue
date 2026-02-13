@@ -1,5 +1,19 @@
 <script setup lang="ts">
+import { type ButtonProps } from '@nuxt/ui'
 const colorMode = useColorMode()
+
+const props = withDefaults(
+  defineProps<{
+    color?: ButtonProps['color']
+    variant?: ButtonProps['variant']
+    class?: string
+  }>(),
+  {
+    color: 'primary',
+    variant: 'ghost',
+    class: '',
+  }
+)
 
 const isDark = computed({
   get() {
@@ -7,7 +21,7 @@ const isDark = computed({
   },
   set(_isDark) {
     colorMode.preference = _isDark ? 'dark' : 'light'
-  }
+  },
 })
 </script>
 
@@ -15,8 +29,9 @@ const isDark = computed({
   <ClientOnly v-if="!colorMode?.forced">
     <UButton
       :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
-      color="neutral"
-      variant="ghost"
+      :color="props.color"
+      :variant="props.variant"
+      :class="props.class"
       :aria-label="`Switch to ${isDark ? 'light' : 'dark'} mode`"
       @click="isDark = !isDark"
     />

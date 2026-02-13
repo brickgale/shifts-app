@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen">
-    <ColorModeButton />
     <slot />
   </div>
 </template>

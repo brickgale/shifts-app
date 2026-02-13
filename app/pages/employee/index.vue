@@ -1,12 +1,14 @@
 <template>
-    <NuxtLayout name="dashboard">
-        <div class="p-4">
-            <h1 class="text-2xl font-bold mb-4">Employee Dashboard</h1>
-            <p>Welcome to the employee dashboard! Here you can view your shifts and manage your schedule.</p>
-        </div>
-    </NuxtLayout>
+  <NuxtLayout name="dashboard">
+    <div class="p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Employee Dashboard</h1>
+      </div>
+      <p>
+        Welcome to the employee dashboard! Here you can view your shifts and manage your schedule.
+      </p>
+    </div>
+  </NuxtLayout>
 </template>
 
-<script setup lang="ts">
-// Default layout for authenticated pages
-</script>
+<script setup lang="ts"></script>

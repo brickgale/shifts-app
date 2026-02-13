@@ -1,9 +1,9 @@
 <template>
   <NuxtLayout name="default" class="min-h-screen flex items-center justify-center px-4">
-    <UCard class="w-full max-w-sm">
+    <UCard class="w-full max-w-sm relative">
+      <ColorModeButton class="absolute top-2 right-2" v-if="isMounted" />
       <h2 class="text-2xl font-semibold text-center mb-4">Shifts App</h2>
-
-      <UForm @submit.prevent="onSubmit" class="flex flex-col space-y-4">
+      <form @submit.prevent="onSubmit" class="flex flex-col space-y-4">
         <UFormField
           label="Email"
           name="email"
@@ -11,7 +11,7 @@
           required
         >
           <UInput
-            v-model="values.email"
+            v-model="email"
             name="email"
             type="email"
             placeholder="your@email.com"
@@ -26,7 +26,7 @@
           required
         >
           <UInput
-            v-model="values.password"
+            v-model="password"
             name="password"
             type="password"
             placeholder="••••••••"
@@ -36,7 +36,7 @@
 
         <UAlert
           v-if="errorMessage"
-          type="error"
+          color="error"
           variant="soft"
           :title="errorMessage"
           :close-button="{
@@ -48,7 +48,7 @@
         <UButton type="submit" block :loading="isSubmitting" :disabled="!isMounted">
           Sign In
         </UButton>
-      </UForm>
+      </form>
     </UCard>
   </NuxtLayout>
 </template>
@@ -71,7 +71,7 @@ onMounted(() => {
   isMounted.value = true
 })
 
-const { values, errors, handleSubmit, isSubmitting, submitCount } = useForm<LoginForm>({
+const { errors, handleSubmit, isSubmitting, submitCount, defineField } = useForm<LoginForm>({
   validationSchema: toTypedSchema(loginSchema),
   initialValues: {
     email: '',
@@ -80,30 +80,36 @@ const { values, errors, handleSubmit, isSubmitting, submitCount } = useForm<Logi
   validateOnMount: false,
 })
 
+const [email] = defineField('email')
+const [password] = defineField('password')
+
 const hasErrors = computed(() => Object.keys(errors.value).length > 0)
 
 const isLoading = ref(false)
 const errorMessage = ref('')
 
-const onSubmit = handleSubmit(async (formValues) => {
-  if (!isMounted.value) return // Prevent submission before hydration
+const onSubmit = handleSubmit(
+  async (formValues) => {
+    isLoading.value = true
+    errorMessage.value = ''
 
-  isLoading.value = true
-  errorMessage.value = ''
+    try {
+      const user = await login(formValues.email, formValues.password)
 
-  try {
-    const user = await login(formValues.email, formValues.password)
-
-    // Redirect based on role
-    if (user.role === 'admin') {
-      await router.push('/admin')
-    } else {
-      await router.push('/employee')
+      // Redirect based on role
+      if (user.role === 'admin') {
+        await router.push('/admin')
+      } else {
+        await router.push('/employee')
+      }
+    } catch (error: any) {
+      errorMessage.value = error.message || 'Login failed. Please try again.'
+    } finally {
+      isLoading.value = false
     }
-  } catch (error: any) {
-    errorMessage.value = error.message || 'Login failed. Please try again.'
-  } finally {
-    isLoading.value = false
+  },
+  (errors) => {
+    console.error('Validation failed:', errors)
   }
-})
+)
 </script>

@@ -1,7 +1,4 @@
 export default defineAppConfig({
-  theme: {
-    primaryColor: 'indigo',
-  },
   ui: {
     button: {
       slots: {
