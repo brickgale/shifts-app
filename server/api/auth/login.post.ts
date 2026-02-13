@@ -1,5 +1,6 @@
 import prisma from '@server/utils/prisma'
 import { compare } from 'bcrypt'
+import { generateToken, setAuthCookie } from '@server/utils/jwt'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -34,11 +35,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Generate JWT token
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  })
+
+  // Set token in httpOnly cookie
+  setAuthCookie(event, token)
+
   // Return user without password
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
+    token, // Also return token for client-side storage if needed
   }
 })

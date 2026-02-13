@@ -1,5 +1,7 @@
 import prisma from '@server/utils/prisma'
 
+const VALID_ROLES = ['admin', 'employee'] as const
+
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
@@ -41,6 +43,14 @@ export default defineEventHandler(async (event) => {
   if (method === 'PUT') {
     const body = await readBody(event)
     const { name, email, role } = body
+
+    // Validate role if provided
+    if (role && !VALID_ROLES.includes(role as any)) {
+      throw createError({
+        statusCode: 400,
+        message: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`,
+      })
+    }
 
     const user = await prisma.user.update({
       where: { id: parseInt(id) },

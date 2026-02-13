@@ -58,12 +58,15 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { loginSchema, type LoginForm } from '~/types/auth'
 
+definePageMeta({
+  middleware: ['guest'],
+})
+
 useSeoMeta({
   title: 'Login - Shifts App',
 })
 
 const { login } = useAuth()
-const router = useRouter()
 
 const isMounted = ref(false)
 
@@ -83,8 +86,6 @@ const { errors, handleSubmit, isSubmitting, submitCount, defineField } = useForm
 const [email] = defineField('email')
 const [password] = defineField('password')
 
-const hasErrors = computed(() => Object.keys(errors.value).length > 0)
-
 const isLoading = ref(false)
 const errorMessage = ref('')
 
@@ -96,12 +97,8 @@ const onSubmit = handleSubmit(
     try {
       const user = await login(formValues.email, formValues.password)
 
-      // Redirect based on role
-      if (user.role === 'admin') {
-        await router.push('/admin')
-      } else {
-        await router.push('/employee')
-      }
+      // Redirect to user's appropriate home page
+      await navigateTo(getRoleHomePage(user.role))
     } catch (error: any) {
       errorMessage.value = error.message || 'Login failed. Please try again.'
     } finally {

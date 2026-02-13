@@ -9,4 +9,9 @@
   </NuxtLayout>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  middleware: ['auth', 'role'],
+  role: 'admin',
+})
+</script>

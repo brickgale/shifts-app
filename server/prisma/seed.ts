@@ -20,34 +20,21 @@ async function main() {
   })
   console.log('✅ Created admin user:', admin.email)
 
-  // Create regular users
-  const user1Password = await hash('user123', 10)
-  const user1 = await prisma.user.upsert({
-    where: { email: 'john@example.com' },
+  // Create employee user
+  const employeePassword = await hash('employee123', 10)
+  const employee = await prisma.user.upsert({
+    where: { email: 'employee@example.com' },
     update: {},
     create: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: user1Password,
-      role: 'user',
+      name: 'Employee User',
+      email: 'employee@example.com',
+      password: employeePassword,
+      role: 'employee',
     },
   })
-  console.log('✅ Created user:', user1.email)
+  console.log('✅ Created employee user:', employee.email)
 
-  const user2Password = await hash('user123', 10)
-  const user2 = await prisma.user.upsert({
-    where: { email: 'jane@example.com' },
-    update: {},
-    create: {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      password: user2Password,
-      role: 'user',
-    },
-  })
-  console.log('✅ Created user:', user2.email)
-
-  // Create shifts
+  // Create shifts for employee
   const now = new Date()
   const tomorrow = new Date(now)
   tomorrow.setDate(tomorrow.getDate() + 1)
@@ -60,19 +47,19 @@ async function main() {
         name: 'Morning Shift',
         startTime: new Date(tomorrow.setHours(8, 0, 0, 0)),
         endTime: new Date(tomorrow.setHours(16, 0, 0, 0)),
-        userId: user1.id,
+        userId: employee.id,
       },
       {
         name: 'Evening Shift',
         startTime: new Date(tomorrow.setHours(16, 0, 0, 0)),
         endTime: new Date(tomorrow.setHours(23, 0, 0, 0)),
-        userId: user2.id,
+        userId: employee.id,
       },
       {
         name: 'Night Shift',
         startTime: new Date(nextWeek.setHours(23, 0, 0, 0)),
         endTime: new Date(nextWeek.setHours(7, 0, 0, 0)),
-        userId: user1.id,
+        userId: employee.id,
       },
     ],
   })

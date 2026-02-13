@@ -1,6 +1,8 @@
 import prisma from '@server/utils/prisma'
 import { hash } from 'bcrypt'
 
+const VALID_ROLES = ['admin', 'employee'] as const
+
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
 
@@ -22,12 +24,20 @@ export default defineEventHandler(async (event) => {
   // POST /api/users - Create a new user
   if (method === 'POST') {
     const body = await readBody(event)
-    const { name, email, password, role = 'user' } = body
+    const { name, email, password, role = 'employee' } = body
 
     if (!name || !email || !password) {
       throw createError({
         statusCode: 400,
         message: 'Name, email, and password are required',
+      })
+    }
+
+    // Validate role
+    if (!VALID_ROLES.includes(role as any)) {
+      throw createError({
+        statusCode: 400,
+        message: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`,
       })
     }
 
