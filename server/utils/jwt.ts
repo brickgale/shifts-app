@@ -1,12 +1,10 @@
+import type { H3Event } from 'h3'
 import jwt from 'jsonwebtoken'
 import type { User } from '~/types/users'
+import type { JWTPayload } from '../types/auth'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 const JWT_EXPIRES_IN = '7d'
-
-export type JWTPayload = Pick<User, 'email' | 'role'> & {
-  userId: number
-}
 
 export const generateToken = (user: Pick<User, 'id' | 'email' | 'role'>): string => {
   const payload: JWTPayload = {
@@ -28,7 +26,7 @@ export const verifyToken = (token: string): JWTPayload | null => {
   }
 }
 
-export const setAuthCookie = (event: any, token: string) => {
+export const setAuthCookie = (event: H3Event, token: string): void => {
   setCookie(event, 'auth_token', token, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
@@ -38,10 +36,10 @@ export const setAuthCookie = (event: any, token: string) => {
   })
 }
 
-export const clearAuthCookie = (event: any) => {
+export const clearAuthCookie = (event: H3Event): void => {
   deleteCookie(event, 'auth_token')
 }
 
-export const getAuthToken = (event: any): string | undefined => {
+export const getAuthToken = (event: H3Event): string | undefined => {
   return getCookie(event, 'auth_token')
 }

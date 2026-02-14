@@ -8,11 +8,19 @@
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #default="{ collapsed }">
-        <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
+        <div class="flex h-13.5 items-center justify-between py-4">
+          <UDashboardSearchButton
+            :collapsed="collapsed"
+            class="bg-transparent ring-default w-full"
+          />
+        </div>
 
         <UNavigationMenu
           :collapsed="collapsed"
           :items="navigationLinks"
+          :ui="{
+            list: 'space-y-2',
+          }"
           orientation="vertical"
           tooltip
           popover
@@ -21,6 +29,9 @@
         <UNavigationMenu
           :collapsed="collapsed"
           :items="bottomLinks"
+          :ui="{
+            list: 'space-y-2',
+          }"
           orientation="vertical"
           tooltip
           class="mt-auto"

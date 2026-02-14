@@ -13,6 +13,11 @@ export default defineAppConfig({
         root: 'rounded-sm',
       },
     },
+    pageCard: {
+      slots: {
+        root: 'hover:ring-primary/25 hover:bg-elevated hover:shadow-inner',
+      },
+    },
     formField: {
       variants: {
         required: {

@@ -1,13 +1,19 @@
 import prisma from '@server/utils/prisma'
 import { hash } from 'bcrypt'
+import { requireAuth } from '@server/utils/auth'
+import { requirePermission, Permissions } from '@server/utils/rbac'
+import { ROLES } from '~/types/users'
+import type { Roles } from '~/types/users'
+import type { CreateUserRequest, UserResponse } from '@server/types/api'
 
-const VALID_ROLES = ['admin', 'employee'] as const
-
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<UserResponse[]> => {
   const method = getMethod(event)
 
-  // GET /api/users - Get all users
+  // GET /api/users - Get all users (admin only)
   if (method === 'GET') {
+    const user = await requireAuth(event)
+    requirePermission(user, Permissions.USER_VIEW_ALL)
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -18,12 +24,15 @@ export default defineEventHandler(async (event) => {
         updatedAt: true,
       },
     })
-    return users
+    return users as UserResponse[]
   }
 
-  // POST /api/users - Create a new user
+  // POST /api/users - Create a new user (admin only)
   if (method === 'POST') {
-    const body = await readBody(event)
+    const currentUser = await requireAuth(event)
+    requirePermission(currentUser, Permissions.USER_CREATE)
+
+    const body = await readBody<CreateUserRequest>(event)
     const { name, email, password, role = 'employee' } = body
 
     if (!name || !email || !password) {
@@ -34,10 +43,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Validate role
-    if (!VALID_ROLES.includes(role as any)) {
+    if (!ROLES.includes(role as Roles)) {
       throw createError({
         statusCode: 400,
-        message: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`,
+        message: `Invalid role. Must be one of: ${ROLES.join(', ')}`,
       })
     }
 
@@ -61,7 +70,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return user
+    return user as unknown as UserResponse[]
   }
 
   throw createError({

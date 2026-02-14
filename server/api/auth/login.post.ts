@@ -1,9 +1,10 @@
 import prisma from '@server/utils/prisma'
 import { compare } from 'bcrypt'
 import { generateToken, setAuthCookie } from '@server/utils/jwt'
+import type { LoginRequest, LoginResponse } from '@server/types/api'
 
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+export default defineEventHandler(async (event): Promise<LoginResponse> => {
+  const body = await readBody<LoginRequest>(event)
   const { email, password } = body
 
   if (!email || !password) {

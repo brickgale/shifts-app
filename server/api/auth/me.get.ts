@@ -1,33 +1,21 @@
-import { getAuthToken, verifyToken } from '@server/utils/jwt'
+import { requireAuth } from '@server/utils/auth'
 import prisma from '@server/utils/prisma'
+import type { UserResponse } from '@server/types/api'
 
-export default defineEventHandler(async (event) => {
-  const token = getAuthToken(event)
+export default defineEventHandler(async (event): Promise<UserResponse> => {
+  // Use the centralized auth utility
+  const authUser = await requireAuth(event)
 
-  if (!token) {
-    throw createError({
-      statusCode: 401,
-      message: 'Not authenticated',
-    })
-  }
-
-  const payload = verifyToken(token)
-
-  if (!payload) {
-    throw createError({
-      statusCode: 401,
-      message: 'Invalid or expired token',
-    })
-  }
-
-  // Fetch fresh user data from database
+  // Fetch fresh user data with timestamps
   const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
+    where: { id: authUser.id },
     select: {
       id: true,
       name: true,
       email: true,
       role: true,
+      createdAt: true,
+      updatedAt: true,
     },
   })
 
@@ -38,5 +26,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return user
+  return user as UserResponse
 })
