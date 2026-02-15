@@ -5,10 +5,6 @@
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-
-        <template #right>
-          <UButton icon="i-lucide-plus" label="Add Shift" variant="outline" color="primary" />
-        </template>
       </UDashboardNavbar>
 
       <UDashboardPanelContent class="p-4 overflow-y-auto">
@@ -34,7 +30,7 @@
           </UPageCard>
         </UPageGrid>
 
-        <ShiftsCalendar class="mt-4" />
+        <ShiftsCalendar class="mt-4 min-h-[calc(100vh-265px)]" />
       </UDashboardPanelContent>
     </UDashboardPanel>
   </NuxtLayout>

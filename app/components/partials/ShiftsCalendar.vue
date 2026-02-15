@@ -27,7 +27,19 @@
                 <UIcon name="i-lucide-calendar" class="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p class="font-medium">{{ shift.name }}</p>
+                <p class="font-medium">
+                  {{ shift.name }}
+                  <UButton
+                    v-if="props.showEditButton"
+                    icon="i-lucide-pencil"
+                    variant="ghost"
+                    :ui="{
+                      leadingIcon: 'size-3',
+                    }"
+                    size="xs"
+                    @click="$emit('edit-shift', shift.id)"
+                  />
+                </p>
                 <p class="text-sm text-muted">{{ shift.user.name }}</p>
                 <div class="flex items-center gap-3 mt-1 text-sm text-muted">
                   <span class="flex items-center gap-1">
@@ -57,6 +69,18 @@ import type { CalendarDate } from '@internationalized/date'
 import { today, getLocalTimeZone } from '@internationalized/date'
 import { shiftsApi } from '~/api/shifts'
 import type { ShiftWithUser } from '~/types/shifts'
+
+export interface ShiftsCalendarProps {
+  showEditButton?: boolean
+}
+
+const props = withDefaults(defineProps<ShiftsCalendarProps>(), {
+  showEditButton: false,
+})
+
+const emit = defineEmits<{
+  'edit-shift': [id: number]
+}>()
 
 const shiftsForDay = ref<ShiftWithUser[]>([])
 const selectedDate = ref<CalendarDate>()
@@ -125,4 +149,13 @@ function formatTime(dateString: string) {
     minute: '2-digit',
   })
 }
+
+// Expose refresh method for parent component
+defineExpose({
+  refreshShifts: () => {
+    if (selectedDate.value) {
+      fetchShiftsForDate(selectedDate.value)
+    }
+  },
+})
 </script>
