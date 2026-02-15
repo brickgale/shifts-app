@@ -21,6 +21,7 @@
     "db:reset": "prisma migrate reset --schema=server/prisma/schema.prisma"
   },
   "dependencies": {
+    "@internationalized/date": "^3.11.0",
     "@nuxt/eslint": "1.15.1",
     "@nuxt/fonts": "0.13.0",
     "@nuxt/hints": "1.0.0-alpha.6",

@@ -90,15 +90,15 @@ const navigationLinks = computed<NavigationMenuItem[][]>(() => {
       {
         label: 'Shifts',
         icon: 'i-lucide-calendar',
-        to: '/admin/shifts',
+        to: '/shifts',
         onSelect: () => {
           sidebarOpen.value = false
         },
       },
       {
-        label: 'Employees',
+        label: 'Users',
         icon: 'i-lucide-users',
-        to: '/admin/employees',
+        to: '/users',
         onSelect: () => {
           sidebarOpen.value = false
         },

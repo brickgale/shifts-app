@@ -9,10 +9,34 @@ export default defineEventHandler(async (event): Promise<ShiftResponse[]> => {
   // GET /api/shifts - Get shifts based on user role
   if (method === 'GET') {
     const user = await requireAuth(event)
+    const query = getQuery(event)
+    const dateParam = query.date as string | undefined
+
+    // Build date filter if date parameter is provided
+    let dateFilter = {}
+    if (dateParam) {
+      // Parse date string (YYYY-MM-DD) and create Date objects without timezone issues
+      const parts = dateParam.split('-').map(Number)
+      if (parts.length === 3 && parts.every((p) => !isNaN(p))) {
+        const year = parts[0]!
+        const month = parts[1]!
+        const day = parts[2]!
+        const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0)
+        const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999)
+
+        dateFilter = {
+          startTime: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        }
+      }
+    }
 
     // Admins can see all shifts
     if (user.role === 'admin') {
       const shifts = await prisma.shift.findMany({
+        where: dateFilter,
         include: {
           user: {
             select: {
@@ -34,6 +58,7 @@ export default defineEventHandler(async (event): Promise<ShiftResponse[]> => {
     const shifts = await prisma.shift.findMany({
       where: {
         userId: user.id,
+        ...dateFilter,
       },
       include: {
         user: {

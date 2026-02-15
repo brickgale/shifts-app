@@ -11,131 +11,39 @@
         </template>
       </UDashboardNavbar>
 
-      <UDashboardPanelContent class="p-4">
-        <UPageGrid class="lg:grid-cols-3 gap-4">
+      <UDashboardPanelContent class="p-4 overflow-y-auto">
+        <UPageGrid class="lg:grid-cols-3 gap-4 lg:gap-0">
           <UPageCard
-            icon="i-lucide-users"
-            title="Total Employees"
+            v-for="stat in statCards"
+            :key="stat.title"
+            :icon="stat.icon"
+            :title="stat.title"
             variant="subtle"
             :ui="{
               container: 'gap-y-1.5',
               wrapper: 'items-start',
-              leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
-              leadingIcon: 'text-primary',
+              leading: `p-2.5 rounded-full ${stat.bgColor} ring ring-inset ${stat.ringColor}`,
+              leadingIcon: stat.iconColor,
               title: 'font-normal text-muted text-xs uppercase',
             }"
+            class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
           >
             <span class="text-2xl font-semibold text-highlighted">
-              {{ stats.totalEmployees }}
-            </span>
-          </UPageCard>
-
-          <UPageCard
-            icon="i-lucide-calendar"
-            title="Active Shifts"
-            variant="subtle"
-            :ui="{
-              container: 'gap-y-1.5',
-              wrapper: 'items-start',
-              leading: 'p-2.5 rounded-full bg-success/10 ring ring-inset ring-success/25',
-              leadingIcon: 'text-success',
-              title: 'font-normal text-muted text-xs uppercase',
-            }"
-          >
-            <span class="text-2xl font-semibold text-highlighted">
-              {{ stats.activeShifts }}
-            </span>
-          </UPageCard>
-
-          <UPageCard
-            icon="i-lucide-clock"
-            title="Pending Requests"
-            variant="subtle"
-            :ui="{
-              container: 'gap-y-1.5',
-              wrapper: 'items-start',
-              leading: 'p-2.5 rounded-full bg-warning/10 ring ring-inset ring-warning/25',
-              leadingIcon: 'text-warning',
-              title: 'font-normal text-muted text-xs uppercase',
-            }"
-          >
-            <span class="text-2xl font-semibold text-highlighted">
-              {{ stats.pendingRequests }}
+              {{ stat.value }}
             </span>
           </UPageCard>
         </UPageGrid>
 
-        <div class="grid gap-4 lg:grid-cols-2 mt-4">
-          <UPageCard
-            title="Recent Shifts"
-            variant="subtle"
-            :ui="{
-              root: 'flex flex-col h-full',
-              container: 'divide-y divide-default',
-              title: 'mb-2',
-            }"
-          >
-            <div
-              v-for="shift in recentShifts"
-              :key="shift.id"
-              class="flex items-center justify-between p-4"
-            >
-              <div>
-                <p class="font-medium">{{ shift.name }}</p>
-                <p class="text-sm text-muted">{{ formatDate(shift.startTime) }}</p>
-              </div>
-              <UBadge :color="getShiftStatus(shift.startTime)" variant="subtle">
-                {{ getShiftLabel(shift.startTime) }}
-              </UBadge>
-            </div>
-          </UPageCard>
-
-          <UPageCard
-            title="Quick Actions"
-            variant="subtle"
-            :ui="{
-              root: 'flex flex-col shrink-0',
-              container: 'divide-y divide-default flex-1',
-              title: 'mb-2',
-            }"
-          >
-            <div class="flex flex-col h-full">
-              <UButton
-                block
-                variant="ghost"
-                icon="i-lucide-user-plus"
-                label="Add Employee"
-                justify="start"
-                color="neutral"
-                class="!rounded-none flex-1 !p-4"
-              />
-              <UButton
-                block
-                variant="ghost"
-                icon="i-lucide-calendar-plus"
-                label="Create Shift"
-                justify="start"
-                color="neutral"
-                class="!rounded-none flex-1 !p-4"
-              />
-              <UButton
-                block
-                variant="ghost"
-                icon="i-lucide-file-text"
-                label="View Reports"
-                justify="start"
-                color="neutral"
-                class="!rounded-none flex-1 !p-4"
-              />
-            </div>
-          </UPageCard>
-        </div>
+        <ShiftsCalendar class="mt-4" />
       </UDashboardPanelContent>
     </UDashboardPanel>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
+import { shiftsApi } from '~/api/shifts'
+import { usersApi } from '~/api/users'
+
 definePageMeta({
   middleware: ['auth', 'role'],
   role: 'admin',
@@ -147,60 +55,47 @@ const stats = ref({
   pendingRequests: 0,
 })
 
-interface ShiftWithUser {
-  id: number
-  name: string
-  startTime: string
-  endTime: string
-  userId: number
-  user: {
-    id: number
-    name: string
-    email: string
-    role: string
-  }
-}
-
-const recentShifts = ref<ShiftWithUser[]>([])
+const statCards = computed(() => [
+  {
+    title: 'Total Employees',
+    icon: 'i-lucide-users',
+    value: stats.value.totalEmployees,
+    bgColor: 'bg-primary/10',
+    ringColor: 'ring-primary/25',
+    iconColor: 'text-primary',
+  },
+  {
+    title: 'Active Shifts',
+    icon: 'i-lucide-calendar',
+    value: stats.value.activeShifts,
+    bgColor: 'bg-success/10',
+    ringColor: 'ring-success/25',
+    iconColor: 'text-success',
+  },
+  {
+    title: 'Pending Requests',
+    icon: 'i-lucide-clock',
+    value: stats.value.pendingRequests,
+    bgColor: 'bg-warning/10',
+    ringColor: 'ring-warning/25',
+    iconColor: 'text-warning',
+  },
+])
 
 onMounted(async () => {
   try {
-    const [usersData, shiftsData] = await Promise.all([
-      $fetch<{ id: number; name: string; email: string; role: string }[]>('/api/users'),
-      $fetch<ShiftWithUser[]>('/api/shifts'),
+    // Ensure minimum loading time of 200ms for better UX
+    const [users, allShifts] = await Promise.all([
+      usersApi.list(),
+      shiftsApi.list(),
+      new Promise((resolve) => setTimeout(resolve, 200)),
     ])
 
-    const users = Array.isArray(usersData) ? usersData : [usersData]
-    const shifts = Array.isArray(shiftsData) ? shiftsData : [shiftsData]
-
     stats.value.totalEmployees = users.length
-    stats.value.activeShifts = shifts.filter((s) => new Date(s.startTime) > new Date()).length
+    stats.value.activeShifts = allShifts.filter((s) => new Date(s.startTime) > new Date()).length
     stats.value.pendingRequests = 0
-
-    recentShifts.value = shifts.slice(0, 5)
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
   }
 })
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function getShiftStatus(startTime: string) {
-  const now = new Date()
-  const start = new Date(startTime)
-  return start > now ? 'success' : 'neutral'
-}
-
-function getShiftLabel(startTime: string) {
-  const now = new Date()
-  const start = new Date(startTime)
-  return start > now ? 'Upcoming' : 'Completed'
-}
 </script>
