@@ -1,69 +1,86 @@
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcrypt'
+import * as fs from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const prisma = new PrismaClient({})
+
+interface SeedUser {
+  name: string
+  email: string
+  password: string
+  role: string
+}
+
+interface SeedShift {
+  name: string
+  dayOffset: number
+  startHour: number
+  endHour: number
+  userIndex: number
+}
+
+interface SeedData {
+  users: SeedUser[]
+  shifts: SeedShift[]
+}
 
 async function main() {
   console.log('🌱 Seeding database...')
 
-  // Create admin user
-  const adminPassword = await hash('admin123', 10)
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
-    update: {},
-    create: {
-      name: 'Admin User',
-      email: 'admin@example.com',
-      password: adminPassword,
-      role: 'admin',
-    },
-  })
-  console.log('✅ Created admin user:', admin.email)
+  // Read seed data from JSON
+  const seedDataPath = join(__dirname, 'seed-data.json')
+  const seedData: SeedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf-8'))
 
-  // Create employee user
-  const employeePassword = await hash('employee123', 10)
-  const employee = await prisma.user.upsert({
-    where: { email: 'employee@example.com' },
-    update: {},
-    create: {
-      name: 'Employee User',
-      email: 'employee@example.com',
-      password: employeePassword,
-      role: 'employee',
-    },
-  })
-  console.log('✅ Created employee user:', employee.email)
+  // Create users
+  const createdUsers = []
+  for (const userData of seedData.users) {
+    const hashedPassword = await hash(userData.password, 10)
+    const user = await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {},
+      create: {
+        name: userData.name,
+        email: userData.email,
+        password: hashedPassword,
+        role: userData.role as 'admin' | 'employee',
+      },
+    })
+    createdUsers.push(user)
+    console.log(`✅ Created ${userData.role} user: ${user.email}`)
+  }
 
-  // Create shifts for employee
-  const now = new Date()
-  const tomorrow = new Date(now)
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  const nextWeek = new Date(now)
-  nextWeek.setDate(nextWeek.getDate() + 7)
+  // Create shifts
+  const today = new Date()
+  today.setHours(0, 0, 0, 0) // Reset to start of day
 
-  await prisma.shift.createMany({
-    data: [
-      {
-        name: 'Morning Shift',
-        startTime: new Date(tomorrow.setHours(8, 0, 0, 0)),
-        endTime: new Date(tomorrow.setHours(16, 0, 0, 0)),
-        userId: employee.id,
+  for (const shiftData of seedData.shifts) {
+    const shiftDate = new Date(today)
+    shiftDate.setDate(shiftDate.getDate() + shiftData.dayOffset)
+
+    const startTime = new Date(shiftDate)
+    startTime.setHours(shiftData.startHour, 0, 0, 0)
+
+    const endTime = new Date(shiftDate)
+    endTime.setHours(shiftData.endHour, 0, 0, 0)
+
+    // Map userIndex to actual user ID
+    const user = createdUsers[shiftData.userIndex]
+
+    await prisma.shift.create({
+      data: {
+        name: shiftData.name,
+        startTime,
+        endTime,
+        userId: user.id,
       },
-      {
-        name: 'Evening Shift',
-        startTime: new Date(tomorrow.setHours(16, 0, 0, 0)),
-        endTime: new Date(tomorrow.setHours(23, 0, 0, 0)),
-        userId: employee.id,
-      },
-      {
-        name: 'Night Shift',
-        startTime: new Date(nextWeek.setHours(23, 0, 0, 0)),
-        endTime: new Date(nextWeek.setHours(7, 0, 0, 0)),
-        userId: employee.id,
-      },
-    ],
-  })
-  console.log('✅ Created sample shifts')
+    })
+  }
+  console.log('✅ Created shifts for the week')
 
   console.log('🎉 Seeding completed!')
 }

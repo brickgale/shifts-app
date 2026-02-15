@@ -1,0 +1,134 @@
+{
+  "users": [
+    {
+      "name": "Admin User",
+      "email": "admin@shifts.app",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "name": "John Smith",
+      "email": "john.smith@shifts.app",
+      "password": "employee123",
+      "role": "employee"
+    },
+    {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@shifts.app",
+      "password": "employee123",
+      "role": "employee"
+    },
+    {
+      "name": "Michael Brown",
+      "email": "michael.brown@shifts.app",
+      "password": "employee123",
+      "role": "employee"
+    },
+    {
+      "name": "Emily Davis",
+      "email": "emily.davis@shifts.app",
+      "password": "employee123",
+      "role": "employee"
+    }
+  ],
+  "shifts": [
+    {
+      "name": "Morning Shift",
+      "dayOffset": 0,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 1
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 0,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 2
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 1,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 3
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 1,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 4
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 2,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 1
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 2,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 2
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 3,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 3
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 3,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 4
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 4,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 1
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 4,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 2
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 5,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 3
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 5,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 4
+    },
+    {
+      "name": "Morning Shift",
+      "dayOffset": 6,
+      "startHour": 8,
+      "endHour": 16,
+      "userIndex": 1
+    },
+    {
+      "name": "Evening Shift",
+      "dayOffset": 6,
+      "startHour": 16,
+      "endHour": 23,
+      "userIndex": 2
+    }
+  ]
+}
