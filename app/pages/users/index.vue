@@ -17,13 +17,12 @@
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold">User List</h3>
               <div class="flex items-center gap-2">
-                <USelectMenu
+                <USelect
                   v-model="selectedRoleFilter"
-                  :options="roleOptions"
+                  :items="roleOptions"
                   value-attribute="value"
                   option-attribute="label"
-                  placeholder="Filter by role"
-                  class="w-48"
+                  class="w-48 h-9"
                 />
                 <UInput
                   v-model="search"
@@ -100,7 +99,7 @@
 
 <script setup lang="ts">
 import { usersApi } from '~/api/users'
-import type { User, Roles } from '~/types/users'
+import { type User, type Roles, ROLES } from '~/types/users'
 
 definePageMeta({
   middleware: ['auth', 'role'],
@@ -112,11 +111,10 @@ const selectedRoleFilter = ref<Roles | 'all'>('all')
 const loading = ref(false)
 const users = ref<User[]>([])
 
-const roleOptions = [
-  { label: 'All Roles', value: 'all' },
-  { label: 'Admin', value: 'admin' },
-  { label: 'Employee', value: 'employee' },
-]
+const roleOptions = computed(() => [
+  { value: 'all', label: 'All Roles' },
+  ...ROLES.map((role) => ({ value: role, label: role.charAt(0).toUpperCase() + role.slice(1) })),
+])
 
 const columns = [
   {
@@ -139,9 +137,6 @@ const columns = [
 
 const filteredUsers = computed(() => {
   let filtered = users.value
-  console.log('Raw users.value:', users.value)
-  console.log('selectedRoleFilter.value:', selectedRoleFilter.value)
-  console.log('search.value:', search.value)
 
   // Filter by role
   if (selectedRoleFilter.value !== 'all') {
