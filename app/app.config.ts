@@ -39,5 +39,15 @@ export default defineAppConfig({
         },
       },
     },
+    select: {
+      slots: {
+        base: 'rounded-sm h-9',
+      },
+    },
+    selectMenu: {
+      slots: {
+        base: 'rounded-sm h-9',
+      },
+    },
   },
 })

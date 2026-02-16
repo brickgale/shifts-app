@@ -22,7 +22,7 @@
                   :items="roleOptions"
                   value-attribute="value"
                   option-attribute="label"
-                  class="w-48 h-9"
+                  class="w-48"
                 />
                 <UInput
                   v-model="search"
