@@ -41,6 +41,7 @@ export interface UpdateUserRequest {
   name?: string
   email?: string
   role?: Roles
+  password?: string
 }
 
 export interface UserResponse {

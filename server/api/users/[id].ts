@@ -1,4 +1,5 @@
 import prisma from '@server/utils/prisma'
+import { hash } from 'bcrypt'
 import { requireAuth } from '@server/utils/auth'
 import { requirePermission, Permissions } from '@server/utils/rbac'
 import { ROLES } from '~/types/users'
@@ -64,7 +65,7 @@ export default defineEventHandler(
       requirePermission(user, Permissions.USER_UPDATE)
 
       const body = await readBody<UpdateUserRequest>(event)
-      const { name, email, role } = body
+      const { name, email, role, password } = body
 
       // Validate role if provided
       if (role && !ROLES.includes(role as Roles)) {
@@ -74,12 +75,19 @@ export default defineEventHandler(
         })
       }
 
+      // Hash password if provided
+      let hashedPassword: string | undefined
+      if (password && password.trim() !== '') {
+        hashedPassword = await hash(password, 10)
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: {
           ...(name && { name }),
           ...(email && { email }),
           ...(role && { role }),
+          ...(hashedPassword && { password: hashedPassword }),
         },
         select: {
           id: true,
