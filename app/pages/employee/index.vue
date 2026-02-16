@@ -11,7 +11,7 @@
         </template>
       </UDashboardNavbar>
 
-      <UDashboardPanelContent>
+      <div>
         <div class="grid gap-4 lg:grid-cols-3">
           <UCard>
             <div class="flex items-center justify-between">
@@ -90,7 +90,7 @@
             </div>
           </div>
         </UCard>
-      </UDashboardPanelContent>
+      </div>
     </UDashboardPanel>
   </NuxtLayout>
 </template>

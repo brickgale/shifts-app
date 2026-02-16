@@ -7,7 +7,7 @@
         </template>
       </UDashboardNavbar>
 
-      <UDashboardPanelContent class="p-4 overflow-y-auto">
+      <div class="p-4 overflow-y-auto">
         <UPageGrid class="lg:grid-cols-3 gap-4 lg:gap-0">
           <UPageCard
             v-for="stat in statCards"
@@ -31,7 +31,7 @@
         </UPageGrid>
 
         <ShiftsCalendar class="mt-4 min-h-[calc(100vh-265px)]" />
-      </UDashboardPanelContent>
+      </div>
     </UDashboardPanel>
   </NuxtLayout>
 </template>
