@@ -25,3 +25,9 @@ logs
 
 # Test coverage
 coverage/
+
+# Database files
+*.db
+*.db-journal
+server/prisma/dev.db
+server/prisma/dev.db-journal
